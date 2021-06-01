@@ -4,9 +4,8 @@ using System;
 
 public class Question {
 
-    private string q;
-    private string kana;
-    private string [][] typingwords;
+    public string q {get;}
+    public string kana {get;}
     public Question(string q, string kana){
         this.q = String.Copy(q);
         this.kana = String.Copy(kana);
@@ -15,7 +14,7 @@ public class Question {
     static private Dictionary<string, string[]> wordTable = new Dictionary<string, string[]>(){
         {"あ", new string[]{"a"}},
         {"い", new string[]{"i"}},
-        {"う", new string[]{"u", "wu"}},
+        {"う", new string[]{"u"}},//"wu"削除　リファクタリングのときに追加するかも
         {"え", new string[]{"e"}},
         {"お", new string[]{"o"}},
         {"か", new string[]{"ka", "ca"}},
@@ -74,11 +73,11 @@ public class Question {
         {"づ", new string[]{"du"}},
         {"で", new string[]{"de"}},
         {"ど", new string[]{"do"}},
-        {"ば", new string[]{"da"}},
-        {"び", new string[]{"di"}},
-        {"ぶ", new string[]{"du"}},
-        {"べ", new string[]{"de"}},
-        {"ぼ", new string[]{"do"}},
+        {"ば", new string[]{"ba"}},
+        {"び", new string[]{"bi"}},
+        {"ぶ", new string[]{"bu"}},
+        {"べ", new string[]{"be"}},
+        {"ぼ", new string[]{"bo"}},
         {"ぱ", new string[]{"pa"}},
         {"ぴ", new string[]{"pi"}},
         {"ぷ", new string[]{"pu"}},
@@ -224,12 +223,86 @@ public class Question {
     public void TransformWords(out string[][] str){
         str = new string[kana.Length][]; 
         int skip = 0;
+        int tsuCount = 0;
         for (int i = 0; i < kana.Length; i++){
             //ひらがなであれば
             if(kana[i] >= '\u3040' && kana[i] <= '\u309F'){
                 string s = new string(kana[i], 1);
-                str[i] = new string[wordTable[s].Length];
-                Array.Copy(wordTable[s], str[i], wordTable[s].Length);
+                str[i - skip] = new string[wordTable[s].Length];
+                Array.Copy(wordTable[s], str[i - skip], wordTable[s].Length);
+
+                //んの指定
+                if(i != 0 && kana[i - 1] == 'ん'){
+                    if(kana[i] == 'あ' || kana[i] == 'い' || kana[i] == 'う' || kana[i] == 'え' || kana[i] == 'お' ||
+                    kana[i] == 'な' || kana[i] == 'に' || kana[i] == 'ぬ' || kana[i] == 'ね' || kana[i] == 'の' ||
+                    kana[i] == 'や' || kana[i] == 'ゆ' || kana[i] == 'よ' || kana[i] == 'ん'){
+                            //二文字のみ許可
+                            str[i - skip - 1] = new string[]{"nn", "xn"};
+                    }
+                }
+                //小文字の設定
+                if(kana[i] == 'ゃ' || kana[i] == 'ゅ' || kana[i] == 'ょ' || kana[i] == 'ぁ' || kana[i] == 'ぃ' || kana[i] == 'ぅ' || kana[i] == 'ぇ' || kana[i] == 'ぉ'){
+                    string t = new string(new char[]{kana[i - 1], kana[i]});
+                    string[] val;
+                    if(wordTable.TryGetValue(t,out val)){
+                        str[i - skip - 1] = new string[wordTable[t].Length];
+                        Array.Copy(wordTable[t], str[i - skip - 1], wordTable[t].Length);
+                        skip++;
+                    }
+                }
+
+                //促音の設定
+                if(kana[i] == 'っ'){
+                    tsuCount++;
+                    //次がひらがなじゃない。または末尾
+                    if(i + 1 == kana.Length || kana[i + 1] < '\u3040' || kana[i + 1] > '\u309F'){
+                        tsuCount--;
+                        string[] t = new string[]{"l","x"};
+                        Array.Resize(ref t, t.Length + wordTable["っ"].Length);
+                        wordTable["っ"].CopyTo(t, t.Length - wordTable["っ"].Length);
+                        for(int j = tsuCount; j > 0; j--){
+                            str[i - skip - j] = new string[t.Length];
+                            Array.Copy(t, str[i - skip - j], t.Length);
+                        }
+                        tsuCount = 0;
+                    }
+                }else if(tsuCount != 0){
+                    //追加文字の指定
+                    string[] t = new string[0];
+                    if(!(s == "あ" || s == "い" || s == "う" || s == "え" || s == "お" || s == "ん")){
+                        for(int j = 0; j < wordTable[s].Length; j++){
+                            bool f = true;
+                            for(int k = 0; k < t.Length; k++){
+                                if(t[k] == wordTable[s][j]){
+                                    f = false;
+                                }
+                            }
+                            if(f){
+                                Array.Resize(ref t, t.Length + 1);
+                                t[t.Length - 1] = new string(wordTable[s][j][0], 1);
+                            }
+                        }
+                    }
+                    
+                    Array.Resize(ref t, t.Length + wordTable["っ"].Length);
+                    wordTable["っ"].CopyTo(t, t.Length - wordTable["っ"].Length);
+                    for(int j = tsuCount; j > 0; j--){
+                        str[i - skip - j] = new string[t.Length];
+                        Array.Copy(t, str[i - skip - j], t.Length);
+                    }
+                    tsuCount = 0;
+                }
+            }else{
+                switch (kana[i])
+                {
+                    case 'ー': str[i - skip] = new string[]{"-"};break; 
+                    case '、': str[i - skip] = new string[]{","};break; 
+                    case '。': str[i - skip] = new string[]{"."};break; 
+                    case '！': str[i - skip] = new string[]{"!"};break; 
+                    case '？': str[i - skip] = new string[]{"?"};break; 
+                    default:break;
+                }
+                str[i - skip] = new string[]{new string(kana[i], 1)};
             }
         }
         Array.Resize<string[]>(ref str, kana.Length - skip);

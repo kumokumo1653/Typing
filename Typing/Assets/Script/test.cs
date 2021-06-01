@@ -5,7 +5,7 @@ using UnityEngine;
 public class test : MonoBehaviour
 {
     // Start is called before the first frame update
-    Question q = new Question("あいうえお","あいうえお");
+    Question q = new Question("あいうえお", "っっ");
 
     void Start()
     {
