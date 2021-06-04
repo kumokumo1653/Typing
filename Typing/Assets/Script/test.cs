@@ -5,18 +5,19 @@ using UnityEngine;
 public class test : MonoBehaviour
 {
     // Start is called before the first frame update
-    Question q = new Question("あいうえお", "っっ");
 
+    string kana = "あいう、";
     void Start()
     {
-        string[][] str;
-        q.TransformWords(out str);
-        for(int i = 0; i < str.Length;i++){
-            string s = "";
-            for(int j = 0; j < str[i].Length;j++){
-                s += str[i][j] + ",";
+        for(int i = 0; i < kana.Length; i++){
+            switch (kana[i])
+            {
+                case 'あ': Debug.Log("a");break;
+                case 'い': Debug.Log("i");break;
+                case 'う': Debug.Log("u");break; 
+                case '、': Debug.Log(",");break; 
+                default:break;
             }
-            Debug.Log(s);
         }
     }
 

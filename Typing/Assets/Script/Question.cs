@@ -23,7 +23,7 @@ public class Question {
         {"け", new string[]{"ke"}},
         {"こ", new string[]{"ko", "co"}},
         {"さ", new string[]{"sa"}},
-        {"し", new string[]{"si", "ci"}},
+        {"し", new string[]{"si", "ci", "shi"}},
         {"す", new string[]{"su"}},
         {"せ", new string[]{"se", "ce"}},
         {"そ", new string[]{"so"}},
@@ -293,6 +293,8 @@ public class Question {
                     tsuCount = 0;
                 }
             }else{
+                
+                str[i - skip] = new string[]{new string(kana[i], 1)};
                 switch (kana[i])
                 {
                     case 'ー': str[i - skip] = new string[]{"-"};break; 
@@ -302,7 +304,6 @@ public class Question {
                     case '？': str[i - skip] = new string[]{"?"};break; 
                     default:break;
                 }
-                str[i - skip] = new string[]{new string(kana[i], 1)};
             }
         }
         Array.Resize<string[]>(ref str, kana.Length - skip);
