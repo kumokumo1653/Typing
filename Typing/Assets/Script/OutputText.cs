@@ -12,6 +12,9 @@ public class OutputText : MonoBehaviour
     public Text kana;
     public Text output;
     public Question q{ get; set;}
+
+    public int allTyping{ get; set;}
+    public int failedTyping{ get; set;}
     public bool playingF{ get; set;}
 
     private int skipF = -1;
@@ -22,9 +25,6 @@ public class OutputText : MonoBehaviour
     private int number = 0;
     void Start()
     {
-        playingF = false;
-        q = new Question(QuestionCollection.questions[number,0], QuestionCollection.questions[number,1]);
-        QuestionInit();        
     }
     
     // Update is called once per frame
@@ -34,13 +34,11 @@ public class OutputText : MonoBehaviour
         if(playingF){
             
             TypeKeyBoard();
-        }else{
-            q = new Question(QuestionCollection.questions[number,0], QuestionCollection.questions[number,1]);
-            QuestionInit();        
         }
     }
 
     public void QuestionInit(){
+        Debug.Log(q.q);
         q.TransformWords(out typingWords);
         indexArray = new int[typingWords.Length];
         text.text = q.q;
@@ -62,7 +60,9 @@ public class OutputText : MonoBehaviour
             //特殊キーではなにもしない
             if(keyStr != ""){
                 foreach(char c in keyStr){
+                    bool failedflag = true;
                     if(c == ' ') continue;
+                    allTyping++;
                     //子音をつづけて入力できる"っ"かどうか
                     if(typingWords[count][typingWords[count].Length - 1] == "xtsu" && typingWords[count].Length != 4){
                         if(skipF == -1){
@@ -73,7 +73,7 @@ public class OutputText : MonoBehaviour
                                     bool f = true;
                                     for(int i = 0; i < index;i++){
                                         if(typingWords[count][indexArray[count]][i] != typingWords[count][k][i])
-                                            f = !f;
+                                            f = false;
                                     }
                                     if(!f) continue;
                                     indexArray[count] = k;
@@ -94,12 +94,12 @@ public class OutputText : MonoBehaviour
                                             }
                                         }
                                     }
-                                    Debug.Log(typingWords[count][k]); 
                                     index++;
                                     if(index == typingWords[count][k].Length){
                                         index = 0;
                                         count++;
                                     }
+                                    failedflag = false;
                                     break;
                                 }
                             }
@@ -110,6 +110,7 @@ public class OutputText : MonoBehaviour
                                     index = 0;
                                     count++;
                                 }
+                                failedflag = false;
                             }
                         }
                     }else{
@@ -129,12 +130,12 @@ public class OutputText : MonoBehaviour
                                     if(!f) continue;
                                 }
                                 indexArray[count] = k;
-                                Debug.Log(typingWords[count][k]); 
                                 index++;
                                 if(index == typingWords[count][k].Length){
                                     index = 0;
                                     count++;
                                 }
+                                failedflag = false;
                                 break;
                             }else if(skipF != -1){
                                 if('t' == c && typingWords[count - 1][0] == "l"){
@@ -144,19 +145,23 @@ public class OutputText : MonoBehaviour
                                     indexArray[count] = indexArray[count] == 0 ? 2 : 3;
                                     Debug.Log(typingWords[count][indexArray[count]]);
                                     skipF = -1;
+                                    failedflag = false;
                                     break;
                                 }
-                                break;
                             }
                             //省略できる"ん"の二度うちの処理
                             else if(count != 0 && c == 'n' && typingWords[count - 1][typingWords[count - 1].Length - 1] == "xn" && typingWords[count - 1].Length == 3){
                                 indexArray[count - 1] = 1;
+                                failedflag = false;
                                 break;
                             }
                         }
                         
                     }
 
+                    if(failedflag){
+                        failedTyping++;
+                    }
 
                 }
                 //表示

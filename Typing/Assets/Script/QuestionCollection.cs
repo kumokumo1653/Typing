@@ -10,5 +10,11 @@ static class QuestionCollection {
         {"printf(\"HelloWorld!\\n\");", "printf(\"HelloWorld!\\n\");"},
         {"微分、積分、いい気分。", "びぶん、せきぶん、いいきぶん。"},
         {"エディタ戦争Vim vs Emacs", "えでぃたせんそうVimvsEmacs"},
+        {"亀の化石レポート", "かめのかせきれぽーと"},
+        {"System.out.println(\"Hello World!\");", "System.out.println(\"HelloWorld!\");"},
+        {"cout << \"HelloWorld!\" << endl;", "cout<<\"HelloWorld!\"<<endl;"},
+        {"はじめての呪文 include", "はじめてのじゅもんinclude"},
+        {"enqueueする買い物客", "enqueueするかいものきゃく"},
+        {"実は！体脂肪をへらす", "じつは！たいしぼうをへらす"},
     };
 }
