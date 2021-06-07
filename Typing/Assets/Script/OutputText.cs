@@ -15,7 +15,7 @@ public class OutputText : MonoBehaviour
 
     public int allTyping{ get; set;}
     public int failedTyping{ get; set;}
-    public bool playingF{ get; set;}
+    public bool typingF{ get; set;}
 
     private int skipF = -1;
     private string [][] typingWords;
@@ -31,7 +31,7 @@ public class OutputText : MonoBehaviour
     void Update()
     {
 
-        if(playingF){
+        if(typingF){
             
             TypeKeyBoard();
         }
@@ -49,7 +49,7 @@ public class OutputText : MonoBehaviour
             output.text += typingWords[i][0];
         }
         
-        playingF = true;
+        typingF = true;
     }
 
     private void TypeKeyBoard(){
@@ -180,7 +180,7 @@ public class OutputText : MonoBehaviour
                     output.text += "</color>";
                     count = 0;
                     index = 0;
-                    playingF = false;
+                    typingF = false;
                     number++;
                 }
             }
