@@ -32,20 +32,11 @@ public class SingleGame : MonoBehaviour
     void Start()
     {
         int[] orderArray = Enumerable.Range(0,QuestionCollection.questions.GetLength(0)).ToArray();
-        string v = "";
-        for(int i = 0; i < orderArray.Length; i++){
-            v += orderArray[i] + ",";
-        }
-        Debug.Log(v);
+
         output = gameObject.GetComponent<OutputText>(); 
         output.typingF = false;
         //問題の設定 シャフル
         postedQuestions = orderArray.OrderBy(i => System.Guid.NewGuid()).ToArray();
-        v = "";
-        for(int i = 0; i < orderArray.Length; i++){
-            v += postedQuestions[i] + ",";
-        }
-        Debug.Log(v);
         Array.Resize(ref postedQuestions, postNumber);
 
         //text
@@ -95,6 +86,7 @@ public class SingleGame : MonoBehaviour
                 StartCoroutine("CountDown");
                 countF = true;
             }
+            
         }
     }
 

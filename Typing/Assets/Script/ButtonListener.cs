@@ -7,10 +7,12 @@ using UnityEngine.SceneManagement;
 public class ButtonListener : MonoBehaviour
 {
     public Button soloButton;
+    public Button multiButton;
 
     void Start()
     {
         soloButton.onClick.AddListener(SoloPlay);
+        multiButton.onClick.AddListener(MultiPlay);
     }
 
 
@@ -19,5 +21,9 @@ public class ButtonListener : MonoBehaviour
         SceneManager.LoadScene("SingleGame");
     }
 
+    public void MultiPlay(){
+        Debug.Log("Multi");
+        SceneManager.LoadScene("MultiGame");
+    }
 
 }
