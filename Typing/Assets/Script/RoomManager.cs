@@ -74,16 +74,22 @@ public class RoomManager : MonoBehaviourPunCallbacks
         Debug.Log("参加");
         //管理用ネットワークオブジェクトの生成
         player = PhotonNetwork.Instantiate("Player", Vector3.zero, Quaternion.identity);
+        player.name = "Player" + PhotonNetwork.LocalPlayer.ActorNumber;
+        //ボタンを生成。ルームオブジェクトにする。マスター制御の生成。
+        if(PhotonNetwork.IsMasterClient){
+            var startButton = PhotonNetwork.InstantiateRoomObject("StartButton", Vector3.zero, Quaternion.identity);
+            startButton.name = "StartButton";
+            startButton.transform.SetParent(disp.transform);
+            RectTransform rect = startButton.transform as RectTransform;
+            rect.localPosition = new Vector3(400, -300, 0);
+            rect.localScale = new Vector3(1, 1, 1);
+            Button button = startButton.GetComponent<Button>();
+            button.onClick.AddListener(() => {player.GetComponent<GameManager>().PushStart(PhotonNetwork.CurrentRoom.PlayerCount);});
 
-        //ボタンを生成。
-        var startButton = PhotonNetwork.Instantiate("StartButton", Vector3.zero, Quaternion.identity);
-        startButton.name = "StartButton";
-        startButton.transform.SetParent(disp.transform);
-        RectTransform rect = startButton.transform as RectTransform;
-        rect.localPosition = new Vector3(400, -300, 0);
-        rect.localScale = new Vector3(1, 1, 1);
-        Button button = startButton.GetComponent<Button>();
-        button.onClick.AddListener(() => {player.GetComponent<GameManager>().PushStart(PhotonNetwork.CurrentRoom.PlayerCount);});
+
+            var obj = PhotonNetwork.InstantiateRoomObject("Master",Vector3.zero, Quaternion.identity);
+            obj.name = "Master";
+        }
 
         LeftButton.gameObject.SetActive(true);
         
