@@ -16,7 +16,7 @@ MonoBehaviour:
     AppIdRealtime: c33d5c29-c11f-4431-9e2d-55035c2b304e
     AppIdChat: 
     AppIdVoice: 
-    AppVersion: 1.0a
+    AppVersion: 1.0
     UseNameServer: 1
     FixedRegion: jp
     Server: 
@@ -36,9 +36,9 @@ MonoBehaviour:
   - ClickRpc
   - DestroyRpc
   - DestroySpaceship
+  - enter
   - Fire
   - RespawnSpaceship
-  - enter
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 0

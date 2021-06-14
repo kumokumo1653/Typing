@@ -148,7 +148,7 @@ namespace Photon.Pun
         private static double lastWarning = 0;
         private static bool postInspectorUpdate;
 
-        
+
 
         [MenuItem("Window/Photon Unity Networking/PUN Wizard &p", false, 0)]
         protected static void MenuItemOpenWizard()
@@ -173,8 +173,7 @@ namespace Photon.Pun
         [UnityEditor.InitializeOnLoadMethod]
         public static void InitializeOnLoadMethod()
         {
-            //Debug.Log("InitializeOnLoadMethod()"); // DEBUG
-
+            //Debug.Log("InitializeOnLoadMethod()");
             EditorApplication.delayCall += OnDelayCall;
         }
 
@@ -182,10 +181,11 @@ namespace Photon.Pun
         // used to register for various events (post-load)
         private static void OnDelayCall()
         {
-            //Debug.Log("OnDelayCall()");// DEBUG
+            //Debug.Log("OnDelayCall()");
 
             postInspectorUpdate = true;
-   
+
+            EditorApplication.playModeStateChanged -= PlayModeStateChanged;
             EditorApplication.playModeStateChanged += PlayModeStateChanged;
 
             CompilationPipeline.assemblyCompilationStarted -= OnCompileStarted;
@@ -200,20 +200,32 @@ namespace Photon.Pun
             EditorApplication.projectWindowChanged += OnProjectChanged;
             #endif
 
-            OnProjectChanged(); // call this initially from here, as the project change events happened earlier (on start of the Editor)
+
+            if (!EditorApplication.isPlaying && !EditorApplication.isPlayingOrWillChangePlaymode)
+            {
+                OnProjectChanged(); // call this initially from here, as the project change events happened earlier (on start of the Editor)
+                PhotonEditor.UpdateRpcList();
+            }
         }
+
 
 
         // called in editor, opens wizard for initial setup, keeps scene PhotonViews up to date and closes connections when compiling (to avoid issues)
         private static void OnProjectChanged()
         {
-            //Debug.Log("OnProjectChanged()"); // DEBUG
+            PhotonEditorUtils.ProjectChangedWasCalled = true;
+
 
             // Prevent issues with Unity Cloud Builds where ServerSettings are not found.
             // Also, within the context of a Unity Cloud Build, ServerSettings is already present anyway.
             #if UNITY_CLOUD_BUILD
             return;
             #endif
+
+            if (PhotonNetwork.PhotonServerSettings == null || PhotonNetwork.PhotonServerSettings.AppSettings == null || string.IsNullOrEmpty(PhotonNetwork.PhotonServerSettings.AppSettings.AppIdRealtime))
+            {
+                PhotonNetwork.LoadOrCreateSettings(true);
+            }
 
             if (PhotonNetwork.PhotonServerSettings == null)
             {
@@ -251,8 +263,9 @@ namespace Photon.Pun
 
         [DidReloadScripts]
         private static void OnDidReloadScripts()
-        { 
-            if (!EditorApplication.isPlayingOrWillChangePlaymode)
+        {
+            //Debug.Log("OnDidReloadScripts() postInspectorUpdate: "+postInspectorUpdate + " isPlayingOrWillChangePlaymode: "+EditorApplication.isPlayingOrWillChangePlaymode);
+            if (postInspectorUpdate && !EditorApplication.isPlayingOrWillChangePlaymode)
             {
                 PhotonEditor.UpdateRpcList(); // could be called when compilation finished (instead of when reload / compile starts)
             }
@@ -260,6 +273,7 @@ namespace Photon.Pun
 
         private static void PlayModeStateChanged(PlayModeStateChange state)
         {
+            //Debug.Log("PlayModeStateChanged");
             if (EditorApplication.isPlaying || !EditorApplication.isPlayingOrWillChangePlaymode)
             {
                 return;
@@ -282,7 +296,7 @@ namespace Photon.Pun
         }
 
         protected void Awake()
-        {  
+        {
             // check if some appid is set. if so, we can avoid registration calls.
             if (PhotonNetwork.PhotonServerSettings != null && PhotonNetwork.PhotonServerSettings.AppSettings != null && !string.IsNullOrEmpty(PhotonNetwork.PhotonServerSettings.AppSettings.AppIdRealtime))
             {
@@ -390,7 +404,7 @@ namespace Photon.Pun
                 {
                     // input should be a mail address
                     this.useMail = true;
-                    
+
                     // check if the current input equals earlier input, which is known to be registered already
                     this.minimumInput = !this.mailOrAppId.Equals(this.emailSentToAccount) || !this.emailSentToAccountIsRegistered;
                 }
@@ -614,7 +628,7 @@ namespace Photon.Pun
                     return;
                 }
             }
-            
+
             this.emailSentToAccount = email;
             this.emailSentToAccountIsRegistered = false;
 
@@ -715,12 +729,14 @@ namespace Photon.Pun
 
         public static void UpdateRpcList()
         {
+            //Debug.Log("UpdateRpcList()");
+
             if (PhotonNetwork.PhotonServerSettings == null)
             {
-                Debug.LogWarning("UpdateRpcList() wasn't able to access the PhotonServerSettings");
+                Debug.LogWarning("UpdateRpcList() wasn not able to access the PhotonServerSettings. Not updating the RPCs.");
                 return;
             }
-             
+
 
             // check all "script assemblies" for methods with PunRPC attribute
             List<string> additionalRpcs = new List<string>();       // not yet listed rpc-method names go here

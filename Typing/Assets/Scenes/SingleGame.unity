@@ -1034,7 +1034,7 @@ MonoBehaviour:
   count: {fileID: 482620291}
   result: {fileID: 1395645555}
   TitleButton: {fileID: 493437729}
-  postNumber: 2
+  postNumber: 4
 --- !u!1 &2030600924
 GameObject:
   m_ObjectHideFlags: 0
