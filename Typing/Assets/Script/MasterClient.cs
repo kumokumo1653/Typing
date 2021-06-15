@@ -5,6 +5,7 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 using Photon.Pun;
+using Photon.Realtime;
 
 public class MasterClient : MonoBehaviourPunCallbacks
 {
@@ -17,6 +18,8 @@ public class MasterClient : MonoBehaviourPunCallbacks
     private int postedNumber = 0;
 
     private int[] postedQuestions;
+
+    public Player[] players{get;set;}
     void Awake()
     {
         Question = GameObject.Find("Question").GetComponent<Text>();
@@ -29,6 +32,8 @@ public class MasterClient : MonoBehaviourPunCallbacks
         int[] orderArray = Enumerable.Range(0,QuestionCollection.questions.GetLength(0)).ToArray();
         postedQuestions = orderArray.OrderBy(i => System.Guid.NewGuid()).ToArray();
         Array.Resize(ref postedQuestions, postNumber);
+
+        players = PhotonNetwork.PlayerList;
     }
 
     public int[] getQuestionArray(){

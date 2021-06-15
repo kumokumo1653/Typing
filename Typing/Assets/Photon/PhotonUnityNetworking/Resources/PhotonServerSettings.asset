@@ -39,6 +39,7 @@ MonoBehaviour:
   - enter
   - Fire
   - RespawnSpaceship
+  - MoveOutput
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 0

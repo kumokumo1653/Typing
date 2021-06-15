@@ -89,6 +89,8 @@ public class RoomManager : MonoBehaviourPunCallbacks
 
             var obj = PhotonNetwork.InstantiateRoomObject("Master",Vector3.zero, Quaternion.identity);
             obj.name = "Master";
+        }else{
+            Debug.Log(GameObject.Find("StartButton"));
         }
 
         LeftButton.gameObject.SetActive(true);
