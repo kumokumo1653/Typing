@@ -76,21 +76,13 @@ public class RoomManager : MonoBehaviourPunCallbacks
         player = PhotonNetwork.Instantiate("Player", Vector3.zero, Quaternion.identity);
         player.name = "Player" + PhotonNetwork.LocalPlayer.ActorNumber;
         //ボタンを生成。ルームオブジェクトにする。マスター制御の生成。
+        var button = GameObject.Find("StartButton(Clone)");
         if(PhotonNetwork.IsMasterClient){
-            var startButton = PhotonNetwork.InstantiateRoomObject("StartButton", Vector3.zero, Quaternion.identity);
-            startButton.name = "StartButton";
-            startButton.transform.SetParent(disp.transform);
-            RectTransform rect = startButton.transform as RectTransform;
-            rect.localPosition = new Vector3(400, -300, 0);
-            rect.localScale = new Vector3(1, 1, 1);
-            Button button = startButton.GetComponent<Button>();
-            button.onClick.AddListener(() => {player.GetComponent<GameManager>().PushStart(PhotonNetwork.CurrentRoom.PlayerCount);});
+            if(button == null){
+                var startButton = PhotonNetwork.InstantiateRoomObject("StartButton", Vector3.zero, Quaternion.identity);
 
-
-            var obj = PhotonNetwork.InstantiateRoomObject("Master",Vector3.zero, Quaternion.identity);
-            obj.name = "Master";
-        }else{
-            Debug.Log(GameObject.Find("StartButton"));
+                var obj = PhotonNetwork.InstantiateRoomObject("Master",Vector3.zero, Quaternion.identity);
+            }
         }
 
         LeftButton.gameObject.SetActive(true);
@@ -101,8 +93,6 @@ public class RoomManager : MonoBehaviourPunCallbacks
         //人数maxなら打ち切り
         if (PhotonNetwork.CurrentRoom.PlayerCount == PhotonNetwork.CurrentRoom.MaxPlayers) {
             PhotonNetwork.CurrentRoom.IsOpen = false;
-            //ボタンを押したことにする。
-            player.GetComponent<GameManager>().PushStart(PhotonNetwork.CurrentRoom.PlayerCount);
         }
     }
 

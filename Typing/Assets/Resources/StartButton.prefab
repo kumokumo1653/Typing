@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 9217700870328494066}
   - component: {fileID: 9217700870328494067}
   - component: {fileID: 605678657539990474}
-  - component: {fileID: 1886357835590068221}
+  - component: {fileID: 447834898868923139}
   m_Layer: 5
   m_Name: StartButton
   m_TagString: Untagged
@@ -141,12 +141,11 @@ MonoBehaviour:
   Synchronization: 3
   OwnershipTransfer: 0
   observableSearch: 2
-  ObservedComponents:
-  - {fileID: 1886357835590068221}
+  ObservedComponents: []
   sceneViewId: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0
---- !u!114 &1886357835590068221
+--- !u!114 &447834898868923139
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -155,7 +154,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 9217700870328494065}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0f62ec610f822ff4eadf221284095993, type: 3}
+  m_Script: {fileID: 11500000, guid: 4c048bcce27e9654bbfc0b392a6862d3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &9217700870995446964

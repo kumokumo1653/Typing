@@ -6,7 +6,7 @@ using UnityEngine.UI;
 using Photon.Pun;
 using Photon.Realtime;
 
-public class GameManager : MonoBehaviourPunCallbacks
+public class GameManager : MonoBehaviourPunCallbacks,IPunInstantiateMagicCallback
 {
 
     private Text statusText;
@@ -23,7 +23,6 @@ public class GameManager : MonoBehaviourPunCallbacks
 
     
     void Awake() {
-        Debug.Log("start");
         statusText = GameObject.Find("statusText").GetComponent<Text>();
         //leftButton = GameObject.Find("LeftButton").GetComponent<Button>();
         room = GameObject.Find("RoomManager").GetComponent<RoomManager>();
@@ -32,7 +31,7 @@ public class GameManager : MonoBehaviourPunCallbacks
     }
     [PunRPC]
     public void enter(){
-        Debug.Log("Enter");
+        startButton = GameObject.Find("StartButton").GetComponent<Button>();
         if(room.status == STATUS.PLAYING)return;
 
         room.status = STATUS.PLAYING;
@@ -42,7 +41,7 @@ public class GameManager : MonoBehaviourPunCallbacks
         //leftButton.gameObject.SetActive(false);
 
 
-        master = GameObject.Find("Master").GetComponent<MasterClient>();
+        master = GameObject.Find("Master(Clone)").GetComponent<MasterClient>();
         if(PhotonNetwork.IsMasterClient){
             master.GameInit();
         }
@@ -52,9 +51,8 @@ public class GameManager : MonoBehaviourPunCallbacks
     }
 
     public void PushStart(int number){
-        //if(number == 1) return;
+        if(number == 1) return;
         if(photonView.IsMine){ 
-            startButton = GameObject.Find("StartButton").GetComponent<Button>();
             photonView.RPC( nameof(enter), RpcTarget.AllViaServer);
         }
         
@@ -63,13 +61,6 @@ public class GameManager : MonoBehaviourPunCallbacks
     private void MyOutputInit(){
         if(photonView.IsMine){
             var obj = PhotonNetwork.Instantiate("Output", Vector3.zero, Quaternion.identity);
-            myOutput = obj.GetComponent<Text>();
-            obj.name = "Output" + photonView.OwnerActorNr;
-            obj.transform.SetParent(disp.transform);
-            RectTransform rect = obj.transform as RectTransform;
-            rect.localPosition = new Vector3(0, 50, 0);
-            rect.localScale = new Vector3(1, 1, 1);
-            myOutput.text = obj.name;
 
             //他のプレイヤーに位置調整の関数を呼び出させる。
             photonView.RPC( nameof(MoveOutput), RpcTarget.Others,obj.name);
@@ -78,6 +69,7 @@ public class GameManager : MonoBehaviourPunCallbacks
 
     [PunRPC]
     private void MoveOutput(string objName){
+        Debug.Log(objName);
         GameObject output = GameObject.Find(objName);
         Debug.Log("呼び出し元:"+output.GetComponent<PhotonView>().OwnerActorNr);
         Debug.Log("実行元:" + PhotonNetwork.LocalPlayer.ActorNumber);
@@ -94,4 +86,13 @@ public class GameManager : MonoBehaviourPunCallbacks
             }
         }
     }
+
+    void IPunInstantiateMagicCallback.OnPhotonInstantiate(PhotonMessageInfo info) {
+        if(info.photonView.gameObject.name == "Player(Clone)"){
+            info.photonView.gameObject.name = "Player" + info.photonView.OwnerActorNr;
+        }
+    }
+
+
+
 }
