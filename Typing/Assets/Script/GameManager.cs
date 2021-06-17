@@ -59,29 +59,28 @@ public class GameManager : MonoBehaviourPunCallbacks,IPunInstantiateMagicCallbac
     }
 
     private void MyOutputInit(){
-        if(photonView.IsMine){
-            var obj = PhotonNetwork.Instantiate("Output", Vector3.zero, Quaternion.identity);
+        Debug.Log("instanse");
+        var obj = PhotonNetwork.Instantiate("Output", Vector3.zero, Quaternion.identity);
 
-            //他のプレイヤーに位置調整の関数を呼び出させる。
-            photonView.RPC( nameof(MoveOutput), RpcTarget.Others,obj.name);
-        }
+        //他のプレイヤーに位置調整の関数を呼び出させる。
+        photonView.RPC( nameof(MoveOutput), RpcTarget.Others,obj.name);
     }
 
     [PunRPC]
     private void MoveOutput(string objName){
         Debug.Log(objName);
+        Debug.Log(master);
+        var players = PhotonNetwork.PlayerListOthers;
         GameObject output = GameObject.Find(objName);
         Debug.Log("呼び出し元:"+output.GetComponent<PhotonView>().OwnerActorNr);
         Debug.Log("実行元:" + PhotonNetwork.LocalPlayer.ActorNumber);
         if(output != null){
-            for(int i = 0; i < master.players.Length;i++){
-                if(!master.players[i].IsLocal){
-                    Debug.Log("リスト"+i+":" + master.players[i].ActorNumber);
-                    if(output.GetComponent<PhotonView>().OwnerActorNr == master.players[i].ActorNumber){
-                        RectTransform rect = output.transform as RectTransform;
-                        rect.localPosition = new Vector3(0, i * -50, 0);
-                        output.GetComponent<Text>().text = master.players[i].ActorNumber + "," + i;
-                    }
+            for(int i = 0; i < players.Length;i++){
+                Debug.Log("リスト"+i+":" + players[i].ActorNumber);
+                if(output.GetComponent<PhotonView>().OwnerActorNr == players[i].ActorNumber){
+                    RectTransform rect = output.transform as RectTransform;
+                    rect.localPosition = new Vector3(0, i * -50, 0);
+                    output.GetComponent<Text>().text = players[i].ActorNumber + "," + i;
                 }
             }
         }

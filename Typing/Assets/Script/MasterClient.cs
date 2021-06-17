@@ -19,7 +19,6 @@ public class MasterClient : MonoBehaviourPunCallbacks
 
     private int[] postedQuestions;
 
-    public Player[] players{get;set;}
     void Awake()
     {
         Question = GameObject.Find("Question").GetComponent<Text>();
@@ -33,7 +32,6 @@ public class MasterClient : MonoBehaviourPunCallbacks
         postedQuestions = orderArray.OrderBy(i => System.Guid.NewGuid()).ToArray();
         Array.Resize(ref postedQuestions, postNumber);
 
-        players = PhotonNetwork.PlayerList;
     }
 
     public int[] getQuestionArray(){
