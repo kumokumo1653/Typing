@@ -41,6 +41,10 @@ MonoBehaviour:
   - RespawnSpaceship
   - MoveOutput
   - MoveStartButton
+  - SetQuestion
+  - SendFinish
+  - SendtoMaster
+  - SendResult
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 0

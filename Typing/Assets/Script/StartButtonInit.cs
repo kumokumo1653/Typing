@@ -4,10 +4,13 @@ using UnityEngine.UI;
 using UnityEngine;
 using Photon.Pun;
 
-public class StartButtonInit : MonoBehaviourPunCallbacks
+public class StartButtonInit : MonoBehaviourPunCallbacks,NetworkObjectInit
 {
-    void Start()
-    {
+    void Start() {
+        ObjectInit();
+    }
+
+    public void ObjectInit(){
         var disp = GameObject.Find("Canvas").GetComponent<Canvas>();
         Debug.Log("startbutton");
         gameObject.name = "StartButton";

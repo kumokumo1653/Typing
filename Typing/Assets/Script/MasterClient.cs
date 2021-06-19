@@ -7,7 +7,7 @@ using UnityEngine.UI;
 using Photon.Pun;
 using Photon.Realtime;
 
-public class MasterClient : MonoBehaviourPunCallbacks
+public class MasterClient : MonoBehaviourPunCallbacks,IPunInstantiateMagicCallback
 {
 
     private Text Question;
@@ -19,10 +19,12 @@ public class MasterClient : MonoBehaviourPunCallbacks
 
     private int[] postedQuestions;
 
-    void Awake()
+    
+
+    void Start()
     {
         Question = GameObject.Find("Question").GetComponent<Text>();
-        kana = GameObject.Find("kana").GetComponent<Text>();
+        kana = GameObject.Find("Kana").GetComponent<Text>();
     }
 
 
@@ -30,12 +32,41 @@ public class MasterClient : MonoBehaviourPunCallbacks
         //問題の設定
         int[] orderArray = Enumerable.Range(0,QuestionCollection.questions.GetLength(0)).ToArray();
         postedQuestions = orderArray.OrderBy(i => System.Guid.NewGuid()).ToArray();
-        Array.Resize(ref postedQuestions, postNumber);
+
 
     }
 
-    public int[] getQuestionArray(){
-        return postedQuestions;
+    void IPunInstantiateMagicCallback.OnPhotonInstantiate(PhotonMessageInfo info) {
+        if(info.photonView.gameObject.name == "Master(Clone)"){
+            info.photonView.gameObject.name = "Master";
+        }
+    }
+
+    public bool NextQuestion(out int question){
+        if(postedNumber == postedQuestions.Length){
+            Debug.Log("finish");
+            question = -1;
+            return false;
+        }else{
+            postedNumber++;
+            question = postedQuestions[postedNumber - 1];
+            return true;
+        }
+    }
+
+    public bool CheckContinue(){
+        var players = PhotonNetwork.PlayerList;
+        int cnt;
+        Debug.Log(players.Length);
+        for(int i = 0; i < players.Length;i++){
+            Debug.Log(players[i].NickName + players[i].ActorNumber);
+            if(players[i].GetWinCount(out cnt)){
+                Debug.Log(players[i].NickName + players[i].ActorNumber + ":" + cnt);
+                if(cnt >= postNumber) 
+                    return false;
+            }
+        }
+        return true;
     }
 
 }

@@ -11,16 +11,19 @@ public enum STATUS{
     OFFLINE,
     MASTERSERVER,
     JOINROOM,
+    WAITING,
     PLAYING,
+    RESULT,
+    FINISHED
 }
 public class RoomManager : MonoBehaviourPunCallbacks
 {
 
     public STATUS status{get;set;}
     public Text statusText;
-    public Text playersText;
 
-    public Button LeftButton;
+    public Button titleButton;
+    public Button leftButton;
     public Canvas disp;
 
     [System.NonSerialized]
@@ -28,7 +31,6 @@ public class RoomManager : MonoBehaviourPunCallbacks
 
 
 
-    private float elapsedTime;
 
     private void Start() {
         // プレイヤー自身の名前を"Player"に設定する
@@ -39,27 +41,21 @@ public class RoomManager : MonoBehaviourPunCallbacks
         status = STATUS.OFFLINE;
         statusText.text = "LOADING...";
 
-        elapsedTime = 0f;
 
         //退出ボタン
-        LeftButton.onClick.AddListener(LeftRoom);
-        LeftButton.gameObject.SetActive(false);
+        leftButton.onClick.AddListener(LeftRoom);
+        leftButton.gameObject.SetActive(false);
+        //タイトルボタン
+        titleButton.onClick.AddListener(LeftRoom);
+        titleButton.gameObject.SetActive(false);
     }
 
 
     private void Update() {
-        
-        if(status == STATUS.JOINROOM){
-            elapsedTime += Time.deltaTime;
-            if(elapsedTime > 0.15f){
-                elapsedTime = 0f;
-                var players = PhotonNetwork.PlayerList;
-                playersText.text = "";
-                for(int i = 0; i < players.Length;i++){
-                    playersText.text += i + 1 + ": " + players[i].NickName + players[i].ActorNumber + "\n";
-                }
-            }
-        }
+       if(status == STATUS.FINISHED){
+           if(!titleButton.gameObject.activeSelf)
+                titleButton.gameObject.SetActive(true);
+       } 
     }
 
     // マスターサーバーへの接続が成功した時に呼ばれるコールバック
@@ -72,20 +68,25 @@ public class RoomManager : MonoBehaviourPunCallbacks
     // ゲームサーバーへの接続が成功した時に呼ばれるコールバック
     public override void OnJoinedRoom() {
         Debug.Log("参加");
+
+        leftButton.gameObject.SetActive(true);
+        
         //管理用ネットワークオブジェクトの生成
         player = PhotonNetwork.Instantiate("Player", Vector3.zero, Quaternion.identity);
         player.name = "Player" + PhotonNetwork.LocalPlayer.ActorNumber;
-        //ボタンを生成。ルームオブジェクトにする。マスター制御の生成。
+
+        //ボタンを生成。ルームオブジェクトにする。マスター制御の生成。テキストの生成。
         var button = GameObject.Find("StartButton(Clone)");
         if(PhotonNetwork.IsMasterClient){
             if(button == null){
                 var startButton = PhotonNetwork.InstantiateRoomObject("StartButton", Vector3.zero, Quaternion.identity);
-
+                var PlayerList = PhotonNetwork.InstantiateRoomObject("PlayerList", Vector3.zero, Quaternion.identity);
+                var questionObj = PhotonNetwork.InstantiateRoomObject("Question", Vector3.zero,Quaternion.identity);
+                var kanaObj = PhotonNetwork.InstantiateRoomObject("Kana", Vector3.zero,Quaternion.identity); 
                 var obj = PhotonNetwork.InstantiateRoomObject("Master",Vector3.zero, Quaternion.identity);
             }
         }
 
-        LeftButton.gameObject.SetActive(true);
         
         status = STATUS.JOINROOM;
         statusText.text = "WAITING...";
@@ -100,6 +101,7 @@ public class RoomManager : MonoBehaviourPunCallbacks
         //入れる部屋がなかったら作る
         var roomOptions = new RoomOptions();
         roomOptions.MaxPlayers = 2;
+        roomOptions.PublishUserId = true;
 
         PhotonNetwork.CreateRoom(null, roomOptions);
         
@@ -109,6 +111,5 @@ public class RoomManager : MonoBehaviourPunCallbacks
         PhotonNetwork.Disconnect();
         SceneManager.LoadScene("Title");
     }
-
 
 }

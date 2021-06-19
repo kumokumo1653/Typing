@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 using Photon.Pun;
@@ -12,39 +13,151 @@ public class GameManager : MonoBehaviourPunCallbacks,IPunInstantiateMagicCallbac
     private Text statusText;
     private Button startButton;
 
+
     private Button leftButton;
 
     private RoomManager room;
     private MasterClient master;
 
-    private Text myOutput;
+    private OutputText myOutput;
+    private GameObject myOutputObj;
 
     private Canvas disp;
+
+
+    private Text countText;
+
+    private Text playersText;
+
+    private Dictionary<string, int> ranking;
+    private string winner;
+
+    private float elapsedTime;
+    private float waitTime;
 
     
     void Awake() {
         statusText = GameObject.Find("statusText").GetComponent<Text>();
-        //leftButton = GameObject.Find("LeftButton").GetComponent<Button>();
         room = GameObject.Find("RoomManager").GetComponent<RoomManager>();
 
         disp = GameObject.Find("Canvas").GetComponent<Canvas>();
+        
+        countText = GameObject.Find("Count").GetComponent<Text>();
+        leftButton = GameObject.Find("LeftButton").GetComponent<Button>();
+        elapsedTime = 0;
+        waitTime = 0;
+        ranking = new Dictionary<string, int>();
+
+    }
+
+    void Start()
+    {
+        playersText = GameObject.Find("PlayerList(Clone)").GetComponent<Text>();
+    }
+    void Update()
+    {
+        elapsedTime += Time.deltaTime;
+        if(elapsedTime > 0.1f){
+            elapsedTime = 0f;
+        
+            if(PhotonNetwork.IsMasterClient){
+                if(room.status == STATUS.JOINROOM){
+                    var players = PhotonNetwork.PlayerList;
+                    playersText.text = "";
+                    for(int i = 0; i < players.Length;i++){
+                        playersText.text += i + 1 + ": " + players[i].NickName + players[i].ActorNumber + "\n";
+                    }
+                }
+                if(room.status == STATUS.PLAYING && myOutput != null){
+                    bool flag;
+                    if(PhotonNetwork.CurrentRoom.GetFinishF(out flag)){
+                        if(flag){
+
+                            int num;
+                            if(master.NextQuestion(out num) && master.CheckContinue()){
+                                Debug.Log("NextQuestion!!!!!!!");
+                                //roomのflag　　falseに
+                                PhotonNetwork.CurrentRoom.SetFinishF(false);
+                                //rpc output問題の設定
+                                myOutput.typingF = true;
+                                photonView.RPC(nameof(SetQuestion), RpcTarget.AllViaServer, num);
+                            }else{
+                                Debug.Log("終了");
+                                GameObject.Find("Question").GetComponent<Text>().text = ""; 
+                                GameObject.Find("Kana").GetComponent<Text>().text = ""; 
+                                photonView.RPC(nameof(SendResult), RpcTarget.All);
+                                
+                                room.status = STATUS.RESULT;
+
+                            }
+                        }
+                    }
+                }
+
+                if(room.status == STATUS.RESULT){
+                    var sortedrank = ranking.OrderByDescending((a) => a.Value);
+                    Debug.Log("result");
+                    playersText.text = "<size=48>" + winner + "WIN</size>\n";
+                    foreach(var player in sortedrank){
+                        Debug.Log(player.Key + ":" + player.Value + "pt");
+                        playersText.text += player.Key + ":" + player.Value + "pt" + "\n";
+                    }
+                    room.status = STATUS.FINISHED;
+                }
+                if(room.status == STATUS.FINISHED){
+                }
+            }
+        }
+    }
+
+
+    [PunRPC]
+    public void SendResult(){
+        myOutputObj.GetComponent<Text>().text = "";
+        if(!PhotonNetwork.IsMasterClient)
+            room.status = STATUS.FINISHED;
+        var players = PhotonNetwork.PlayerList;
+        int cnt;
+        int max = 0;
+        for(int i = 0; i < players.Length;i++){
+            if(players[i].GetWinCount(out cnt)){
+                ranking.Add(players[i].NickName + players[i].ActorNumber, cnt);
+                if(max < cnt){
+                    max = cnt;
+                    winner = players[i].NickName + players[i].ActorNumber;
+                }
+            }
+        }
+        foreach(var player in ranking){
+            Debug.Log(player.Key + ":" + player.Value + "pt");
+        }
+    }
+    [PunRPC]
+    public void SetQuestion(int num){
+        myOutput.q = new Question(QuestionCollection.questions[num, 0], QuestionCollection.questions[num, 1]);
+        myOutput.QuestionInit();
     }
     [PunRPC]
     public void enter(){
         startButton = GameObject.Find("StartButton").GetComponent<Button>();
-        if(room.status == STATUS.PLAYING)return;
+        if(room.status == STATUS.WAITING)return;
 
-        room.status = STATUS.PLAYING;
-        statusText.text = "PLAYING!!";
+        room.status = STATUS.WAITING;
 
         startButton.gameObject.SetActive(false);
-        //leftButton.gameObject.SetActive(false);
+        leftButton.gameObject.SetActive(false);
+        statusText.text = "";
+        playersText.text = "";
 
+        //獲得本数の初期化
+        PhotonNetwork.LocalPlayer.SetWinCount(0);
 
-        master = GameObject.Find("Master(Clone)").GetComponent<MasterClient>();
+        master = GameObject.Find("Master").GetComponent<MasterClient>();
         if(PhotonNetwork.IsMasterClient){
             master.GameInit();
         }
+
+        
         MyOutputInit();
 
 
@@ -60,10 +173,11 @@ public class GameManager : MonoBehaviourPunCallbacks,IPunInstantiateMagicCallbac
 
     private void MyOutputInit(){
         Debug.Log("instanse");
-        var obj = PhotonNetwork.Instantiate("Output", Vector3.zero, Quaternion.identity);
+        myOutputObj = PhotonNetwork.Instantiate("Output", Vector3.zero, Quaternion.identity);
+        myOutput = myOutputObj.GetComponent<OutputText>();
 
         //他のプレイヤーに位置調整の関数を呼び出させる。
-        photonView.RPC( nameof(MoveOutput), RpcTarget.Others,obj.name);
+        photonView.RPC( nameof(MoveOutput), RpcTarget.Others,myOutputObj.name);
     }
 
     [PunRPC]
@@ -72,20 +186,40 @@ public class GameManager : MonoBehaviourPunCallbacks,IPunInstantiateMagicCallbac
         Debug.Log(master);
         var players = PhotonNetwork.PlayerListOthers;
         GameObject output = GameObject.Find(objName);
-        Debug.Log("呼び出し元:"+output.GetComponent<PhotonView>().OwnerActorNr);
-        Debug.Log("実行元:" + PhotonNetwork.LocalPlayer.ActorNumber);
         if(output != null){
             for(int i = 0; i < players.Length;i++){
-                Debug.Log("リスト"+i+":" + players[i].ActorNumber);
                 if(output.GetComponent<PhotonView>().OwnerActorNr == players[i].ActorNumber){
                     RectTransform rect = output.transform as RectTransform;
-                    rect.localPosition = new Vector3(0, i * -50, 0);
+                    rect.localPosition = new Vector3(0, -50 + i * -50, 0);
+                    output.GetComponent<Text>().fontSize = 20;
                     output.GetComponent<Text>().text = players[i].ActorNumber + "," + i;
                 }
             }
         }
+
+        StartCoroutine("CountDown");
     }
 
+    private IEnumerator CountDown() {
+        countText.text = "3";
+        yield return new WaitForSeconds(1.0f);
+        countText.text = "2";
+        yield return new WaitForSeconds(1.0f);
+        countText.text = "1";
+        yield return new WaitForSeconds(1.0f);
+        countText.text = "";
+
+        room.status = STATUS.PLAYING;
+        //開始時間の保存
+        if(PhotonNetwork.IsMasterClient){
+            PhotonNetwork.CurrentRoom.SetStartTime(PhotonNetwork.ServerTimestamp);
+            PhotonNetwork.CurrentRoom.SetFinishF(true);
+        }
+        int a;
+        Debug.Log(PhotonNetwork.LocalPlayer.GetWinCount( out a));
+        Debug.Log(PhotonNetwork.LocalPlayer.NickName + PhotonNetwork.LocalPlayer.ActorNumber);
+        yield break;
+    }
     void IPunInstantiateMagicCallback.OnPhotonInstantiate(PhotonMessageInfo info) {
         if(info.photonView.gameObject.name == "Player(Clone)"){
             info.photonView.gameObject.name = "Player" + info.photonView.OwnerActorNr;

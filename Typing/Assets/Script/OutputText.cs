@@ -41,8 +41,10 @@ public class OutputText : MonoBehaviour
         Debug.Log(q.q);
         q.TransformWords(out typingWords);
         indexArray = new int[typingWords.Length];
-        text.text = q.q;
-        kana.text = q.kana;
+        if(text.text != q.q){
+            text.text = q.q;
+            kana.text = q.kana;
+        }
 
         output.text = "";
         for(int i =  0; i < typingWords.Length; i++){
