@@ -35,6 +35,14 @@ public class GameManager : MonoBehaviourPunCallbacks,IPunInstantiateMagicCallbac
     private float elapsedTime;
     private float waitTime;
 
+    //sound
+
+    [SerializeField]
+    private AudioSource audio;
+    [SerializeField]
+    private AudioClip downClip;
+    [SerializeField]
+    private AudioClip lastClip;
     
     void Awake() {
         statusText = GameObject.Find("statusText").GetComponent<Text>();
@@ -47,12 +55,15 @@ public class GameManager : MonoBehaviourPunCallbacks,IPunInstantiateMagicCallbac
         elapsedTime = 0;
         waitTime = 0;
         ranking = new Dictionary<string, int>();
+        if(audio == null)
+            audio = gameObject.AddComponent<AudioSource>();
 
     }
 
     void Start()
     {
-        playersText = GameObject.Find("PlayerList(Clone)").GetComponent<Text>();
+        if(PhotonNetwork.IsMasterClient)
+            playersText = GameObject.Find("PlayerList(Clone)").GetComponent<Text>();
     }
     void Update()
     {
@@ -72,15 +83,14 @@ public class GameManager : MonoBehaviourPunCallbacks,IPunInstantiateMagicCallbac
                     bool flag;
                     if(PhotonNetwork.CurrentRoom.GetFinishF(out flag)){
                         if(flag){
-
                             int num;
-                            if(master.NextQuestion(out num) && master.CheckContinue()){
+                            if(master.NextQuestion(out num) && master.CheckContinue() ){
                                 Debug.Log("NextQuestion!!!!!!!");
-                                //roomのflag　　falseに
-                                PhotonNetwork.CurrentRoom.SetFinishF(false);
-                                //rpc output問題の設定
-                                myOutput.typingF = true;
-                                photonView.RPC(nameof(SetQuestion), RpcTarget.AllViaServer, num);
+                                    //roomのflag　　falseに
+                                    PhotonNetwork.CurrentRoom.SetFinishF(false);
+                                    //rpc output問題の設定
+                                    myOutput.typingF = true;
+                                    photonView.RPC(nameof(SetQuestion), RpcTarget.AllViaServer, num);
                             }else{
                                 Debug.Log("終了");
                                 GameObject.Find("Question").GetComponent<Text>().text = ""; 
@@ -133,7 +143,9 @@ public class GameManager : MonoBehaviourPunCallbacks,IPunInstantiateMagicCallbac
         }
     }
     [PunRPC]
-    public void SetQuestion(int num){
+    public void SetQuestion(int num,PhotonMessageInfo info){
+        Debug.Log("Question:"+ num);
+        Debug.Log(info.Sender.NickName + info.Sender.ActorNumber);
         myOutput.q = new Question(QuestionCollection.questions[num, 0], QuestionCollection.questions[num, 1]);
         myOutput.QuestionInit();
     }
@@ -147,13 +159,13 @@ public class GameManager : MonoBehaviourPunCallbacks,IPunInstantiateMagicCallbac
         startButton.gameObject.SetActive(false);
         leftButton.gameObject.SetActive(false);
         statusText.text = "";
-        playersText.text = "";
 
         //獲得本数の初期化
         PhotonNetwork.LocalPlayer.SetWinCount(0);
 
         master = GameObject.Find("Master").GetComponent<MasterClient>();
         if(PhotonNetwork.IsMasterClient){
+            playersText.text = "";
             master.GameInit();
         }
 
@@ -202,12 +214,16 @@ public class GameManager : MonoBehaviourPunCallbacks,IPunInstantiateMagicCallbac
 
     private IEnumerator CountDown() {
         countText.text = "3";
+        audio.PlayOneShot(downClip, 1.0f);
         yield return new WaitForSeconds(1.0f);
         countText.text = "2";
+        audio.PlayOneShot(downClip, 1.0f);
         yield return new WaitForSeconds(1.0f);
         countText.text = "1";
+        audio.PlayOneShot(downClip, 1.0f);
         yield return new WaitForSeconds(1.0f);
         countText.text = "";
+        audio.PlayOneShot(lastClip, 1.0f);
 
         room.status = STATUS.PLAYING;
         //開始時間の保存

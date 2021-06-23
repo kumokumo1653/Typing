@@ -23,8 +23,18 @@ public class OutputText : MonoBehaviour
     private int count = 0;
     private int index = 0;
     private int number = 0;
-    void Start()
-    {
+
+    //sound
+    [SerializeField]
+    private AudioSource audio;
+    [SerializeField]
+    private AudioClip[] typingClip;
+    [SerializeField]
+    private AudioClip[] wrongTypingClip;
+
+     void Awake() {
+        if(audio == null)
+            audio = gameObject.AddComponent<AudioSource>();
     }
     
     // Update is called once per frame
@@ -163,6 +173,9 @@ public class OutputText : MonoBehaviour
 
                     if(failedflag){
                         failedTyping++;
+                        audio.PlayOneShot(wrongTypingClip[Random.Range(0,wrongTypingClip.Length)],1.0f);
+                    }else{
+                        audio.PlayOneShot(typingClip[Random.Range(0,typingClip.Length)],1.0f);
                     }
 
                 }

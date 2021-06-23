@@ -29,6 +29,16 @@ public class SingleGame : MonoBehaviour
     private bool finishF = false;
     private float startTime;
     private float endTime;
+
+    //sound
+
+    [SerializeField]
+    private AudioSource audio;
+    [SerializeField]
+    private AudioClip downClip;
+    [SerializeField]
+    private AudioClip lastClip;
+
     void Start()
     {
         int[] orderArray = Enumerable.Range(0,QuestionCollection.questions.GetLength(0)).ToArray();
@@ -93,12 +103,16 @@ public class SingleGame : MonoBehaviour
     private IEnumerator CountDown() 
     {
         count.text = "3";
+        audio.PlayOneShot(downClip, 1.0f);
         yield return new WaitForSeconds(1.0f);
         count.text = "2";
+        audio.PlayOneShot(downClip, 1.0f);
         yield return new WaitForSeconds(1.0f);
         count.text = "1";
+        audio.PlayOneShot(downClip, 1.0f);
         yield return new WaitForSeconds(1.0f);
         count.text = "";
+        audio.PlayOneShot(lastClip, 1.0f);
         playingF = true;
         countF = false;
         startTime = Time.time;

@@ -145,3 +145,11 @@ MonoBehaviour:
   text: {fileID: 0}
   kana: {fileID: 0}
   output: {fileID: 0}
+  audio: {fileID: 0}
+  typingClip:
+  - {fileID: 8300000, guid: 8705bc774dd5d6e4a9c803ceab9c2f74, type: 3}
+  - {fileID: 8300000, guid: c39d194abc8d6be4b815bb702d836b30, type: 3}
+  - {fileID: 8300000, guid: 32565c6d9dd00424ba7606e62d7247d4, type: 3}
+  wrongTypingClip:
+  - {fileID: 8300000, guid: e5cb29c4ad660b3499cef69ea099a41e, type: 3}
+  - {fileID: 8300000, guid: 4ce42b4cefc69e6408f115d844874681, type: 3}

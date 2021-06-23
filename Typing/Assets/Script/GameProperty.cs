@@ -5,11 +5,11 @@ using Photon.Realtime;
 
 public static class GameProperty {
 
-    private const string keyStartTime = "StartTime";
-    private const string keyFinishF = "FinishF";
+    private const string keyStartTime = "S";
+    private const string keyFinishF = "F";
 
 
-    private const string keyPlayerWin = "PlayerWin";
+    private const string keyPlayerWin = "P";
 
     private static readonly Hashtable propsToSet = new Hashtable();
 

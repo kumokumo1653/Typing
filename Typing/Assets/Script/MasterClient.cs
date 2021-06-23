@@ -57,9 +57,7 @@ public class MasterClient : MonoBehaviourPunCallbacks,IPunInstantiateMagicCallba
     public bool CheckContinue(){
         var players = PhotonNetwork.PlayerList;
         int cnt;
-        Debug.Log(players.Length);
         for(int i = 0; i < players.Length;i++){
-            Debug.Log(players[i].NickName + players[i].ActorNumber);
             if(players[i].GetWinCount(out cnt)){
                 Debug.Log(players[i].NickName + players[i].ActorNumber + ":" + cnt);
                 if(cnt >= postNumber) 

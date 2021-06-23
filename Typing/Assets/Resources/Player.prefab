@@ -66,3 +66,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 20b6d58b17560e14883d91509a1f2d19, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  audio: {fileID: 0}
+  downClip: {fileID: 8300000, guid: eb23d6d720e671148a246037a9324005, type: 3}
+  lastClip: {fileID: 8300000, guid: bed068cdd53edb842a6487ff26671dd6, type: 3}
