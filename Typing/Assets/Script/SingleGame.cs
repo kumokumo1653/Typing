@@ -16,6 +16,7 @@ public class SingleGame : MonoBehaviour
     public Text result;
 
     public Button TitleButton;
+    public Button RegisterButton;
 
     public int postNumber;
 
@@ -55,6 +56,9 @@ public class SingleGame : MonoBehaviour
         //Button
         TitleButton.gameObject.SetActive(false);
         TitleButton.onClick.AddListener(ChangeSceneTitle);
+
+        RegisterButton.gameObject.SetActive(false);
+        RegisterButton.onClick.AddListener(ChangeSceneRegister);
     }
 
     // Update is called once per frame
@@ -75,6 +79,9 @@ public class SingleGame : MonoBehaviour
                 playingF = false;
                 //ボタン表示
                 TitleButton.gameObject.SetActive(true);
+                RegisterButton.gameObject.SetActive(true);
+                //playerprefにスコア保存
+                PlayerPrefs.SetFloat("Score", score);
             }else if(!output.typingF){
                 if(postedNumber >= postNumber){
                     Debug.Log("finish");
@@ -123,5 +130,8 @@ public class SingleGame : MonoBehaviour
         SceneManager.LoadScene("Title");
     }
 
+    public void ChangeSceneRegister(){
+        SceneManager.LoadScene("Register");
+    }
 
 }
