@@ -37,7 +37,6 @@ public class RegisterManager : MonoBehaviour
         scoreText.text += score.ToString();
         titleButton.onClick.AddListener(ClickTitle);
         registerButton.onClick.AddListener(ClickRegister);
-        //httpClient = new HttpClient("http://5jgames.com:4567/typing/");
         //ボタンの有効
         titleButton.GetComponent<Image>().raycastTarget = true;
         registerButton.GetComponent<Image>().raycastTarget = true;
@@ -71,8 +70,8 @@ public class RegisterManager : MonoBehaviour
     }
     public void ClickBack(){
         //ボタンの有効
-        titleButton.GetComponent<Image>().raycastTarget = true;
-        registerButton.GetComponent<Image>().raycastTarget = true;
+        titleButton.gameObject.SetActive(true);
+        registerButton.gameObject.SetActive(true);
         inputField.GetComponent<Image>().raycastTarget = true;
         //ボタンの無効化
         doneButton.gameObject.SetActive(false);
@@ -102,7 +101,7 @@ public class RegisterManager : MonoBehaviour
         yield return httpClient.SendWebRequest();
         if (httpClient.result != UnityWebRequest.Result.Success)
         {
-            confirm.text = "エラーが発生しました。インターネットの接続を確認し、しばらくしてからお試しください";
+            instructions.text = "エラーが発生しました。インターネットの接続を確認し、しばらくしてからお試しください";
         }
         else
         {
@@ -114,7 +113,8 @@ public class RegisterManager : MonoBehaviour
                 instructions.text = "<color=red>ユーザ名は1-128文字の半角英数字または記号のみで構成される必要があります</color>";
             }else if(status != 1){
                 //ボタンの無効
-                titleButton.GetComponent<Image>().raycastTarget = false;
+                titleButton.gameObject.SetActive(false);
+                registerButton.gameObject.SetActive(false);
                 registerButton.GetComponent<Image>().raycastTarget = false;
                 inputField.GetComponent<Image>().raycastTarget = false;
 
@@ -138,7 +138,7 @@ public class RegisterManager : MonoBehaviour
         yield return httpClient.SendWebRequest();
         if (httpClient.result != UnityWebRequest.Result.Success)
         {
-            confirm.text = "エラーが発生しました。インターネットの接続を確認し、しばらくしてからお試しください";
+            instructions.text = "エラーが発生しました。インターネットの接続を確認し、しばらくしてからお試しください";
         }
         else
         { 
@@ -149,7 +149,7 @@ public class RegisterManager : MonoBehaviour
             //ボタンの無効化
             backButton.gameObject.SetActive(false);
             doneButton.gameObject.SetActive(false);
-            titleButton.GetComponent<Image>().raycastTarget = true; 
+            titleButton.gameObject.SetActive(true); 
         }
     }
 }
