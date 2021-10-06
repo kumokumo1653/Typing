@@ -35,6 +35,10 @@ public class OutputText : MonoBehaviour
      void Awake() {
         if(audio == null)
             audio = gameObject.AddComponent<AudioSource>();
+
+        text.text = "";
+        kana.text = "";
+        output.text = "";
     }
     
     // Update is called once per frame
@@ -175,7 +179,7 @@ public class OutputText : MonoBehaviour
                         failedTyping++;
                         audio.PlayOneShot(wrongTypingClip[Random.Range(0,wrongTypingClip.Length)],1.0f);
                     }else{
-                        audio.PlayOneShot(typingClip[Random.Range(0,typingClip.Length)],1.0f);
+                        //audio.PlayOneShot(typingClip[Random.Range(0,typingClip.Length)],1.0f);
                     }
 
                 }
