@@ -43,6 +43,10 @@ public class GameManager : MonoBehaviourPunCallbacks,IPunInstantiateMagicCallbac
     private AudioClip downClip;
     [SerializeField]
     private AudioClip lastClip;
+
+    private bool done = false;
+
+    private GameObject localBar;
     
     void Awake() {
         statusText = GameObject.Find("statusText").GetComponent<Text>();
@@ -82,7 +86,8 @@ public class GameManager : MonoBehaviourPunCallbacks,IPunInstantiateMagicCallbac
                 if(room.status == STATUS.PLAYING && myOutput != null){
                     bool flag;
                     if(PhotonNetwork.CurrentRoom.GetFinishF(out flag)){
-                        if(flag){
+                        if(flag && !done){
+                            done = true;
                             int num;
                             if(master.NextQuestion(out num) && master.CheckContinue() ){
                                 Debug.Log("NextQuestion!!!!!!!");
@@ -148,6 +153,7 @@ public class GameManager : MonoBehaviourPunCallbacks,IPunInstantiateMagicCallbac
         Debug.Log(info.Sender.NickName + info.Sender.ActorNumber);
         myOutput.q = new Question(QuestionCollection.questions[num, 0], QuestionCollection.questions[num, 1]);
         myOutput.QuestionInit();
+        done = false;
     }
     [PunRPC]
     public void enter(){
@@ -172,7 +178,10 @@ public class GameManager : MonoBehaviourPunCallbacks,IPunInstantiateMagicCallbac
         
         MyOutputInit();
 
+        //processBar
 
+        localBar = PhotonNetwork.Instantiate("Slider", new Vector3(0,0,0), Quaternion.identity);
+        PhotonNetwork.Instantiate("PlayerName", Vector3.zero, Quaternion.identity);
     }
 
     public void PushStart(int number){

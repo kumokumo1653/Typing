@@ -17,6 +17,7 @@ public class SingleGame : MonoBehaviour
 
     public Button TitleButton;
     public Button RegisterButton;
+    public Slider processBar;
 
     public int postNumber;
 
@@ -59,6 +60,9 @@ public class SingleGame : MonoBehaviour
 
         RegisterButton.gameObject.SetActive(false);
         RegisterButton.onClick.AddListener(ChangeSceneRegister);
+
+        //Slider
+        processBar.maxValue = postNumber;
     }
 
     // Update is called once per frame
@@ -86,10 +90,12 @@ public class SingleGame : MonoBehaviour
                 if(postedNumber >= postNumber){
                     Debug.Log("finish");
                     finishF = true;
+                    processBar.value = postedNumber;
                 }else{
 
                     output.q = new Question(QuestionCollection.questions[postedQuestions[postedNumber],0], QuestionCollection.questions[postedQuestions[postedNumber],1]);
                     output.QuestionInit();        
+                    processBar.value = postedNumber;
                     postedNumber++;
                 }
 

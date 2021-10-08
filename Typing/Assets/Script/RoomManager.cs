@@ -90,6 +90,7 @@ public class RoomManager : MonoBehaviourPunCallbacks
         
         status = STATUS.JOINROOM;
         statusText.text = "WAITING...";
+        statusText.text += "\n<size=30>I am " + player.name + "</size>";
 
         //人数maxなら打ち切り
         if (PhotonNetwork.CurrentRoom.PlayerCount == PhotonNetwork.CurrentRoom.MaxPlayers) {

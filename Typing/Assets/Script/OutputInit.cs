@@ -10,6 +10,8 @@ public class OutputInit : MonoBehaviourPunCallbacks,IPunInstantiateMagicCallback
     private float elapsedTime;
     private bool preF;
     private OutputText output;
+
+    private Slider slider;
     void Awake() {
         ObjectInit();
         elapsedTime = 0;
@@ -17,6 +19,7 @@ public class OutputInit : MonoBehaviourPunCallbacks,IPunInstantiateMagicCallback
     }
     void Start() {
         preF = true;
+        slider = GameObject.Find("Slider" + photonView.OwnerActorNr).GetComponent<Slider>();
     }
     void IPunInstantiateMagicCallback.OnPhotonInstantiate(PhotonMessageInfo info) {
         if(info.photonView.gameObject.name == "Output(Clone)"){
@@ -52,6 +55,7 @@ public class OutputInit : MonoBehaviourPunCallbacks,IPunInstantiateMagicCallback
             PhotonNetwork.CurrentRoom.SetFinishF(true);
             if(info.Sender.GetWinCount(out cnt)){
                 info.Sender.SetWinCount(cnt + 1);
+                slider.value = cnt + 1;
             }
 
 
