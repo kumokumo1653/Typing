@@ -1,5 +1,4 @@
-using System.Collections;
-using System.Collections.Generic;
+using System.Collections;using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
 using UnityEngine.UI;
@@ -11,8 +10,10 @@ public class SliderInit : MonoBehaviourPunCallbacks,NetworkObjectInit
     [SerializeField] private GameObject master;
     void Awake()
     {
-        room = GameObject.Find("RoomManager").GetComponent<RoomManager>();
-        ObjectInit();
+        if(room != null){
+            room = GameObject.Find("RoomManager").GetComponent<RoomManager>();
+            ObjectInit();
+        }
     }
     void Start()
     {
@@ -23,9 +24,11 @@ public class SliderInit : MonoBehaviourPunCallbacks,NetworkObjectInit
     // Update is called once per frame
     void Update()
     {
-        if(room.status == STATUS.FINISHED){
-            this.gameObject.SetActive(false);
-        } 
+        if(room){
+            if(room.status == STATUS.FINISHED){
+                this.gameObject.SetActive(false);
+            } 
+        }
     }
 
     public void ObjectInit(){

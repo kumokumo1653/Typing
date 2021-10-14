@@ -171,10 +171,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0cd44c1031e13a943bb63640046fad76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_UiScaleMode: 0
+  m_UiScaleMode: 1
   m_ReferencePixelsPerUnit: 100
   m_ScaleFactor: 1
-  m_ReferenceResolution: {x: 800, y: 600}
+  m_ReferenceResolution: {x: 1152, y: 720}
   m_ScreenMatchMode: 0
   m_MatchWidthOrHeight: 0
   m_PhysicalUnit: 3
@@ -1247,7 +1247,7 @@ MonoBehaviour:
   TitleButton: {fileID: 493437729}
   RegisterButton: {fileID: 706210003}
   processBar: {fileID: 2047008557}
-  postNumber: 5
+  postNumber: 7
   audio: {fileID: 1860173241}
   downClip: {fileID: 8300000, guid: eb23d6d720e671148a246037a9324005, type: 3}
   lastClip: {fileID: 8300000, guid: bed068cdd53edb842a6487ff26671dd6, type: 3}
@@ -1452,6 +1452,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 179758607}
     m_Modifications:
+    - target: {fileID: 6014931006526572889, guid: 2288a86a684118c4682cb154afd9ea07, type: 3}
+      propertyPath: sceneViewId
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 7545011967301499016, guid: 2288a86a684118c4682cb154afd9ea07, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
@@ -1548,5 +1552,6 @@ PrefabInstance:
       propertyPath: m_AnchorMax.y
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 6014931006526572889, guid: 2288a86a684118c4682cb154afd9ea07, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: 2288a86a684118c4682cb154afd9ea07, type: 3}

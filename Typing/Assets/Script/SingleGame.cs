@@ -90,6 +90,7 @@ public class SingleGame : MonoBehaviour
                 if(postedNumber >= postNumber){
                     Debug.Log("finish");
                     finishF = true;
+                    
                     processBar.value = postedNumber;
                 }else{
 
